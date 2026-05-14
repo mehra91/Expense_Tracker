@@ -110,7 +110,10 @@ const loginUser = async (req, res) => {
 //fetch currentUser details
 
 const getCurrentUser = async (req, res) => {
-  const user = await user.findById(req.user.id).select("name email").select("-password");
+  const user = await user
+    .findById(req.user.id)
+    .select("name email")
+    .select("-password");
   try {
     if (!user) {
       return res.status(404).json({
@@ -158,4 +161,43 @@ const updateUser = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, getCurrentUser , updateUser };
+// change Password
+const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword || !newPassword.length < 8) {
+    return res.json(400).json({
+      success: false,
+      message: "password invalid or password length is short",
+    });
+  }
+  try {
+    const user = await User.findById(req.user.id).select("password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "user not found",
+      });
+    }
+    const userMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!userMatch) {
+      return res.json(401).json({
+        success: false,
+        message: "current  Password was wrong ",
+      });
+    }
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({
+      success: true,
+      message: "password change successfully",
+    });
+  } catch (error) {
+    console.log("error from userController 1 : ", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+export { registerUser, loginUser, getCurrentUser, updateUser ,changePassword};
