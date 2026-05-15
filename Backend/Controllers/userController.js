@@ -1,6 +1,6 @@
 import User from "../Models/userModel.js";
-import Validator from "validator";
-import bcrypt from "bcrypt";
+import validator from "validator";
+import bcrypt, { hash } from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const jwtSecret = process.env.JWTSECRET;
@@ -46,7 +46,11 @@ const registerUser = async (req, res) => {
       return hash;
     };
 
-    const user = await User.create({ name, email, password: hashPassword });
+    const user = await User.create({
+      name,
+      email,
+      password: await hashPassword(password),
+    });
     const token = createToken(user._id);
     res.status(201).json({
       success: true,
@@ -72,7 +76,7 @@ const loginUser = async (req, res) => {
     });
   }
   try {
-    const user = await findOne({ email }).select("-password");
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -108,11 +112,9 @@ const loginUser = async (req, res) => {
 //fetch currentUser details
 
 const getCurrentUser = async (req, res) => {
-  const user = await user
-    .findById(req.user.id)
-    .select("name email")
-    .select("-password");
   try {
+    const user = await User.findById(req.user.id)
+      .select("name email")
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -145,7 +147,7 @@ const updateUser = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.user.id,
       { $set: { name } },
-      { new: true },
+      { returnDocument: 'after' },
     ).select("-password"); // it means password doesn't send to frontend
     res.status(200).json({
       success: true,
@@ -162,7 +164,7 @@ const updateUser = async (req, res) => {
 // change Password
 const changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
-  if (!currentPassword || !newPassword || !newPassword.length < 8) {
+  if (!currentPassword || !newPassword || newPassword.length < 8) {
     return res.json(400).json({
       success: false,
       message: "password invalid or password length is short",
@@ -178,24 +180,24 @@ const changePassword = async (req, res) => {
     }
     const userMatch = await bcrypt.compare(currentPassword, user.password);
     if (!userMatch) {
-      return res.json(401).json({
+      return res.status(401).json({
         success: false,
         message: "current  Password was wrong ",
       });
     }
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
-    res.json({
+     return res.status(401).json({
       success: true,
       message: "password change successfully",
     });
   } catch (error) {
     console.log("error from userController 1 : ", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Server Error",
     });
   }
 };
 
-export { registerUser, loginUser, getCurrentUser, updateUser ,changePassword};
+export { registerUser, loginUser, getCurrentUser, updateUser, changePassword };
