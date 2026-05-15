@@ -1,9 +1,7 @@
-import User from "../Models/userModel";
+import User from "../Models/userModel.js";
 import Validator from "validator";
 import bcrypt from "bcrypt";
-import userModel from "../Models/userModel";
 import jwt from "jsonwebtoken";
-import { use } from "react";
 
 const jwtSecret = process.env.JWTSECRET;
 
