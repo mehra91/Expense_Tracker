@@ -1,14 +1,14 @@
 import express from 'express'
-import {addExpense, getExpense, updateExpense, deleteExpense, incomeOverview}from  '../Controllers/incomeController.js'
+import { addExpense, getExpense, updateExpense, deleteExpense, expenseOverview}from  '../Controllers/expenseController.js'
 import {authMiddleware} from '../Middleware/auth.js'
 
 const expenseRouter = express.Router();
 
-expenseRouter.post('/addExp',authMiddleware,addIncome);
-expenseRouter.get('/getExp',authMiddleware,getIncome);
-expenseRouter.put('/updateExp/:id',authMiddleware,updateIncome);
-expenseRouter.delete('/deleteExp/:id',authMiddleware,deleteIncome);
-expenseRouter.get('/overviewExp',authMiddleware,incomeOverview);
+expenseRouter.post('/addExp',authMiddleware,addExpense);
+expenseRouter.get('/getExp',authMiddleware,getExpense);
+expenseRouter.put('/updateExp/:id',authMiddleware,updateExpense);
+expenseRouter.delete('/deleteExp/:id',authMiddleware,deleteExpense);
+expenseRouter.get('/overviewExp',authMiddleware,expenseOverview);
 
 
 
