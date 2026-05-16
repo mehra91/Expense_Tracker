@@ -1,5 +1,5 @@
 import mongoose, { mongo } from "mongoose";
-import userModel from "./userModel";
+import userModel from "./userModel.js";
 
 const incomeSchema = new mongoose.Schema(
   {

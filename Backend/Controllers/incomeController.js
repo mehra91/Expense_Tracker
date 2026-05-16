@@ -38,11 +38,11 @@ const addIncome = async (req, res) => {
 const getIncome = async (req, res) => {
   const userId = req.user._id;
   try {
-    const income = (await incomeModel.find({ userId })).sort({ date: -1 }); // -1 means newest first ,1 means oldest first
-    res.json(income);
+    const income = await incomeModel.find({ userId }).sort({ date: -1 }); // -1 means newest first ,1 means oldest first
+    return res.json(income);
   } catch (error) {
     console.log("error from incomeController 1:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "server error",
     });
