@@ -1,4 +1,5 @@
 import incomeModel from "../Models/incomeModel.js";
+import { getDateRange } from "../utils/dateRange.js";
 
 // add income
 const addIncome = async (req, res) => {
@@ -115,21 +116,33 @@ const deleteIncome = async (req, res) => {
 // overview of income
 
 const incomeOverview = async (req, res) => {
-  const userId = req.user._id;
   try {
-    const income = await incomeModel.find({ userId });
+    const userId = req.user._id;
+    const { range = "monthly" } = req.query;
+    const { start, end } = getDateRange(range);
+    const income = await incomeModel
+      .find({
+        userId,
+        date: { $gte: start, $lte: end }, // $gte = greater then or equal and $lte = less than or equal
+      })
+      .sort({ date: -1 });
+
     const totalIncome = income.reduce((acc, curr) => acc + curr.amount, 0);
-    const highestIncome = Math.max(
-      ...income.map((i) => {
-        return i.amount;
-      }),
-    );
-    const lowestIncome = Math.min(...income.map((i) => i.amount));
+    const highestIncome =
+      income.length > 0
+        ? Math.max(
+            ...income.map((i) => {
+              return i.amount;
+            }),
+          )
+        : 0;
+    const lowestIncome =
+      income.length > 0 ? Math.min(...income.map((i) => i.amount)) : 0;
     const averageIncome = income.length > 0 ? totalIncome / income.length : 0;
     const numberOfTransactions = income.length;
     const recentTransactions = income.slice(0, 3);
 
-    res.json({
+   return  res.status(200).json({
       success: true,
       data: {
         totalIncome,
@@ -149,4 +162,4 @@ const incomeOverview = async (req, res) => {
   }
 };
 
-export { addIncome, getIncome, updateIncome, deleteIncome };
+export { addIncome, getIncome, updateIncome, deleteIncome, incomeOverview };
