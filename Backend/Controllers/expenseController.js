@@ -78,7 +78,7 @@ const updateExpense = async (req, res) => {
     return res.json({
       success: true,
       message: " expense updated successfully",
-      date: updatedexpense,
+      date: updatedExpense,
     });
   } catch (error) {
     console.log("error from expenseController 2 :", error);
