@@ -6,6 +6,7 @@ export const StoreContextProvider = ({ children }) => {
   const [user, setUser] = useState("null");
   const [token, setToken] = useState("null");
   const navigate = useNavigate();
+  const url = 'http://localhost:4000';
   const clearAuth = () => {
     try {
       localStorage.removeItem("user");
@@ -30,6 +31,7 @@ export const StoreContextProvider = ({ children }) => {
     token,
     setToken,
     logOut,
+    url
   };
 
   return (
