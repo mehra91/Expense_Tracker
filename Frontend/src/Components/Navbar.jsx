@@ -1,20 +1,62 @@
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { StoreContext } from "../context/storeContext.jsx";
 import { navbarStyles } from '../assets/dummyStyles'
 import img1 from '../assets/logo.png';
-import { Navigate } from 'react-router-dom';
-import { ChevronDown, LogOut ,User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronDown, LogOut, User } from 'lucide-react';
+import axios from 'axios';
+
 
 const Navbar = (prop) => {
-  const { logOut } = useContext(StoreContext);
+  const { logOut, url ,user,setUser } = useContext(StoreContext);
+  const navigate = useNavigate();
 
   const menuRef = useRef();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const user = prop.User || {
-    name: "",
-    email: ""
-  }
+   
+  // Fetch the user data from server
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const response = await axios.get(`${url}/api/user/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        })
+        const userData = response.data.user || response.data
+        setUser(userData);
+
+      
+      } catch (error) {
+        console.log('error form fetch user :', error);
+      }
+    }
+    if(!user){
+      fetchUser();
+    }
+  }, [user])
+
+// close the toogle menu click on outside
+ useEffect(()=>{
+    const handleOutsideClick = (e)=>{
+       if(menuRef.current && !menuRef.current.contains(e.target)){
+        setMenuOpen(false);
+       }
+
+    };
+    document.addEventListener('mousedown',handleOutsideClick);
+    return ()=>{
+      document.removeEventListener('mousedown',handleOutsideClick);
+    }
+ },[]);
+
+
+
+
 
   const toogleMenu = () => setMenuOpen((prev) => !prev)
 
@@ -22,7 +64,7 @@ const Navbar = (prop) => {
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className='flex items-center justify-between px-4 py-3 md:px-8 max-w-7xl mx-auto'>
         <div onClick={() => {
-          Navigate('/')
+          navigate('/')
         }} className='flex items-center gap-0 cursor-pointer'>
           <div className='w-15 h-15 rounded-xl overflow-hidden'>
             <img src={img1} alt="logo" />
@@ -52,7 +94,7 @@ const Navbar = (prop) => {
                   {user?.email || 'user@gmail.com'}
                 </p>
               </div>
-              <ChevronDown className={`${menuOpen}`} />
+              <ChevronDown className={`${menuOpen ? "rotate-180" : ""} cursor-pointer transition-all duration-300 `} />
             </button>
             {/* dropdown Menu */}
             {
@@ -64,7 +106,7 @@ const Navbar = (prop) => {
                         {user?.name?.[0]?.toUpperCase() || 'U'}
 
                       </div>
-                      <div className='text-sm text-gray-800'>
+                      <div className='text-sm text-gray-800 '>
                         {user?.name || 'User'}
                       </div>
                       <div className='text-xs text-gray-500'>
@@ -78,8 +120,8 @@ const Navbar = (prop) => {
                         Navigate('/profile')
                       }} className='w-full px-4 py-3 text-left hover:bg-gray-50 text-sm text-gray-700 flex items-center gap-3 rounded-lg'>
 
-                        <User className='w-4 h-4' />
-                        <span>
+                        <User className='w-4 h-4  ' />
+                        <span className='cursor-pointer'>
                           My profile
                         </span>
 
@@ -87,12 +129,12 @@ const Navbar = (prop) => {
                       </button>
                     </div>
                     <div className='p-1.5 border-t border-gray-100'>
-                          <button onClick={logOut} className='flex w-full items-center gap-3 px-4 py-3 text-sm hover:bg-red-50 text-red-600 rounded-lg'>
-                              <LogOut className='w-4 h-4'/>
-                              <span>
-                                Log Out
-                              </span>
-                          </button>
+                      <button onClick={logOut} className='flex w-full items-center gap-3 px-4 py-3 text-sm hover:bg-red-50 text-red-600 rounded-lg'>
+                        <LogOut className='w-4 h-4  ' />
+                        <span className='cursor-pointer'>
+                          Log Out
+                        </span>
+                      </button>
                     </div>
                   </div>
 
