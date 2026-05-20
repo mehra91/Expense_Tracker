@@ -8,7 +8,7 @@ userRouter.post('/register',registerUser);
 userRouter.post('/login',loginUser);
 
 // protected routes
-userRouter.get('/user',authMiddleware,getCurrentUser);
+userRouter.get('/me',authMiddleware,getCurrentUser);
 userRouter.put('/profile',authMiddleware,updateUser);
 userRouter.put('/password',authMiddleware,changePassword);
 
