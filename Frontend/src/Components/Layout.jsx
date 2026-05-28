@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import {styles} from '../assets/dummyStyles'
 import Navbar from './Navbar'
-import { Sidebar } from 'lucide-react'
+import Sidebar from './Sidebar'
 
 const Layout = () => {
   const[sidebarCollapse,setSidebarCollapse] = useState(false);

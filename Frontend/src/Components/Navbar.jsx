@@ -117,7 +117,7 @@ const Navbar = (prop) => {
                     <div className='p-1.5'>
                       <button onClick={() => {
                         setMenuOpen(false);
-                        Navigate('/profile')
+                        navigate('/profile')
                       }} className='w-full px-4 py-3 text-left hover:bg-gray-50 text-sm text-gray-700 flex items-center gap-3 rounded-lg'>
 
                         <User className='w-4 h-4  ' />
